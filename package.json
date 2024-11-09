@@ -9,8 +9,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js",
-    "dev": "NODE_ENV=development nodemon src/server.js",
+    "start": "node ./src/server.js",
+    "dev": "NODE_ENV=development nodemon ./src/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{js,json,md}\""
@@ -52,5 +52,8 @@
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }

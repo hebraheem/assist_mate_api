@@ -1,4 +1,7 @@
 import AppError from '../utils/appError.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Utility function for sending responses
 const sendErrorResponse = (err, res) => {
@@ -14,7 +17,6 @@ const errorHandler = (err, req, res, next) => {
   if (!(err instanceof AppError)) {
     err = new AppError(err.message || 'Server Error', 500);
   }
-
   // Check the environment
   if (process.env.NODE_ENV === 'development') {
     // Detailed error for development

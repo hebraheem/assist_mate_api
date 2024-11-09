@@ -1,5 +1,39 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { serve, setup } from 'swagger-ui-express';
+import localStorage from '../utils/localStorage.js';
+
+const getTokenToPersist = {
+  swaggerOptions: {
+    authAction: {
+      authorize: {
+        name: 'BearerAuth',
+        schema: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'Authorization',
+        },
+        value: localStorage.getItem('jwtToken') || '', // Persist token from localStorage
+      },
+    },
+    onComplete: function () {
+      // Swagger UI: On load, check for a stored token in localStorage
+      const storedToken = localStorage.getItem('jwtToken');
+      if (storedToken) {
+        ui.authActions.authorize({
+          BearerAuth: {
+            name: 'BearerAuth',
+            schema: {
+              type: 'apiKey',
+              in: 'header',
+              name: 'Authorization',
+            },
+            value: storedToken,
+          },
+        });
+      }
+    },
+  },
+};
 
 // Basic metadata for Swagger documentation
 const options = {
@@ -9,6 +43,15 @@ const options = {
       title: 'Assist Mate ',
       version: '1.0.0',
       description: 'API documentation for assist mate REST API',
+    },
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
     },
     servers: [
       {
@@ -23,8 +66,7 @@ const swaggerSpec = swaggerJsdoc(options);
 
 const setupSwaggerDocs = (app) => {
   // Swagger documentation route
-  app.use('/api-docs', serve, setup(swaggerSpec));
-  console.log('Swagger Docs are available at /api-docs');
+  app.use('/api-docs', serve, setup(swaggerSpec, getTokenToPersist));
 };
 
 export default setupSwaggerDocs;

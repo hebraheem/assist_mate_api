@@ -64,7 +64,7 @@ assist_mate_api/
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/assist_mate_api.git
+   git clone git@github.com:hebraheem/assist_mate_api.git
    cd assist_mate_api
    ```
 
@@ -136,14 +136,14 @@ Formats code according to Prettier settings.
 
 ### Testing
 
-You can configure tests under a `tests/` folder and add test scripts (e.g., using Mocha, Jest).
+
 
 ## API Documentation
 
 Swagger documentation is generated from the `swagger/swagger.json` file. To view the API documentation:
 
 1. Start the server.
-2. Visit `http://localhost:5000/api-docs` in your browser.
+2. Visit `http://localhost:4000/api-docs` in your browser.
 
 ## Error Handling
 

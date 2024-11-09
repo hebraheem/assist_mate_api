@@ -8,7 +8,7 @@ const { getAuth, GoogleAuthProvider } = require('firebase/auth'); // Firebase Au
 dotenv.config();
 
 // Initialize Firebase Admin SDK
-var serviceAccount = require('./assist-mate-3fbbf-firebase-adminsdk-htbjf-d19714a887.json');
+var serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

@@ -1,1 +1,1 @@
-web: NODE_PATH=./src node ./src/server.js
+web: node src/server.js

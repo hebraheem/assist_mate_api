@@ -70,6 +70,7 @@ export const getRequests = async (req, res, next) => {
       model: 'Request',
       where: searchCriteria,
       orderBy,
+      include: [{ path: 'user', select: 'firstName lastName id' }],
       //   select,
     }).performQuery();
   } catch (error) {
@@ -79,7 +80,10 @@ export const getRequests = async (req, res, next) => {
 
 export const getRequest = async (req, res, next) => {
   try {
-    const request = await Request.findById(req.params.id);
+    const request = await Request.findById(req.params.id).populate({
+      path: 'user',
+      select: 'firstName lastName id',
+    });
     if (!request) {
       return next(new AppError('Request not found', 404));
     }

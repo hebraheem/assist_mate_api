@@ -8,7 +8,7 @@ import { sendEmailVerification } from 'firebase/auth';
 export const getUser = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const userData = await User.findOne({ id });
+    const userData = await User.findOne({ id }).populate('requests');
     if (!userData) {
       return next(new AppError('No user found with that ID', 404));
     }
@@ -59,6 +59,12 @@ export const getAllUsers = async (req, res, next) => {
       model: 'User',
       where: searchCriteria,
       orderBy,
+      include: [
+        {
+          path: 'requests',
+          select: 'title description dueDateTime status',
+        },
+      ],
       //   select,
     }).performQuery();
   } catch (error) {

@@ -24,7 +24,7 @@ export const createUser = async (req, res, next) => {
     });
 
     const userRecord = await saveUserToMongoose(req, res, user?.uid);
-
+    req.session.user = user;
     return res
       .status(201)
       .json({ user: userRecord, messaging: 'Email verification sent' });
@@ -76,6 +76,7 @@ export const loginUser = async (req, res, next) => {
           displayName: user.displayName,
         },
       });
+      req.session.user = user;
       localStorage.setItem('jwtToken', idToken);
       localStorage.setItem('userCredential', JSON.stringify(userCredential));
     });
@@ -93,6 +94,7 @@ export const googleLogin = async (req, res, next) => {
       // Get ID token after successful login
       const idToken = await user.getIdToken();
       await saveUserToMongoose(req, res, user?.uid);
+      req.session.user = user;
       res.status(200).json({
         message: 'Google login successful',
         idToken,

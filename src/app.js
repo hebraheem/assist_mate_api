@@ -11,6 +11,7 @@ import errorHandler from './middlewares/errorHandler.js';
 import { handleNotFoundError } from './middlewares/errorUtils.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import requestRoutes from './routes/requestRoutes.js';
 import authenticateFirebaseToken from './middlewares/authMiddleware.js';
 import setupSwaggerDocs from './config/swagger.js';
 import MongoStore from 'connect-mongo';
@@ -48,6 +49,7 @@ setupSwaggerDocs(app);
 // Routes
 app.use('/auth', authRoutes);
 app.use('/', authenticateFirebaseToken, userRoutes);
+app.use('/', authenticateFirebaseToken, requestRoutes);
 
 // 404 Handler
 app.use(handleNotFoundError); // Catch any non-existing routes

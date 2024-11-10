@@ -77,7 +77,7 @@ const userSchema = new Schema(
     address: addressSchema,
     settings: settingsSchema,
   },
-  { timestamps: true }, // Automatically adds createdAt and updatedAt
+  { timestamps: true },
 );
 
 userSchema.index({

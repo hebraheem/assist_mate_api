@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs/dist/bcrypt.js';
 import { admin, auth } from '../config/firebase.cjs';
-import User from '../models/user.js';
+import User from '../models/User.js';
 import AppError from '../utils/appError.js';
 import PaginatedQuery from '../utils/paginatedQuery.js';
 import { sendEmailVerification } from 'firebase/auth';

@@ -8,7 +8,7 @@ import {
 import { admin, auth, googleAuth } from '../config/firebase.cjs';
 import localStorage from '../utils/localStorage.js';
 import AppError from '../utils/appError.js';
-import User from '../models/user.js';
+import User from '../models/User.js';
 
 export const messageChannelUrl = `https://assistmate.netlify.app/action`;
 

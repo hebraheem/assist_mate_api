@@ -1,6 +1,11 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { serve, setup } from 'swagger-ui-express';
 import localStorage from '../utils/localStorage.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
 
 const getTokenToPersist = {
   swaggerOptions: {
@@ -55,7 +60,11 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:4000', // Update with your server URL
+        url: baseUrl,
+        description:
+          process.env.NODE_ENV === 'production'
+            ? 'Production server'
+            : 'Local server',
       },
     ],
   },

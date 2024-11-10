@@ -15,6 +15,8 @@ import requestRoutes from './routes/requestRoutes.js';
 import authenticateFirebaseToken from './middlewares/authMiddleware.js';
 import setupSwaggerDocs from './config/swagger.js';
 import MongoStore from 'connect-mongo';
+import Request from './models/request.js';
+import checkOwnership from './middlewares/allowOwner.js';
 
 const app = express();
 dotenv.config();
@@ -49,7 +51,7 @@ setupSwaggerDocs(app);
 // Routes
 app.use('/auth', authRoutes);
 app.use('/', authenticateFirebaseToken, userRoutes);
-app.use('/', authenticateFirebaseToken, requestRoutes);
+app.use('/', authenticateFirebaseToken, checkOwnership(Request), requestRoutes);
 
 // 404 Handler
 app.use(handleNotFoundError); // Catch any non-existing routes

@@ -6,8 +6,6 @@ import {
   getRequests,
   updateRequest,
 } from '../controllers/requestController.js';
-import checkOwnership from '../middlewares/allowOwner.js';
-import Request from '../models/request.js';
 
 const router = express.Router();
 
@@ -266,7 +264,7 @@ router.post('/requests', createRequest);
  *       404:
  *         description: Request not found
  */
-router.patch('/requests/:id', checkOwnership(Request), updateRequest);
+router.patch('/requests/:id', updateRequest);
 
 /**
  * @swagger
@@ -290,6 +288,6 @@ router.patch('/requests/:id', checkOwnership(Request), updateRequest);
  *       404:
  *         description: Request not found
  */
-router.delete('/requests/:id', checkOwnership(Request), deleteRequest);
+router.delete('/requests/:id', deleteRequest);
 
 export default router;

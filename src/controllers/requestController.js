@@ -9,7 +9,11 @@ export const createRequest = async (req, res, next) => {
     if (!user) {
       return next(new AppError('User not signed in', 403));
     }
-    const request = new Request({ ...req.body, user: user._id });
+    const request = new Request({
+      ...req.body,
+      user: user._id,
+      createdBy: user._id,
+    });
     await request.save();
     const createdRequest = request.toObject();
 
@@ -54,6 +58,7 @@ export const getRequests = async (req, res, next) => {
   if (category) {
     searchCriteria.category = category;
   }
+
   if (status) {
     searchCriteria.status = status;
   }

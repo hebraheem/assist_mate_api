@@ -17,6 +17,11 @@ class PaginatedQuery {
       const limit = parseInt(this.req.query.limit) || 100;
       const skip = (page - 1) * limit;
 
+      if (this.req?.queryFilter) {
+        // return only the current user document
+        this.where.createdBy = this.req.queryFilter.createdBy;
+      }
+
       // Find documents and get total count
       const [data, total] = await Promise.all([
         _model(this.model)

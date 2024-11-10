@@ -5,6 +5,7 @@ import {
   getAllUsers,
   deleteUser,
   sendVerificationEmail,
+  getNearbyUsers,
 } from '../controllers/userController.js';
 import hasPermission from '../middlewares/accessMiddleware.js';
 
@@ -373,5 +374,62 @@ router.delete('/users/:id', hasPermission, deleteUser);
  *         description: Server error
  */
 router.post('/send-verification-email', sendVerificationEmail);
+
+/**
+ * @swagger
+ * /users/near/{maxDistance}:
+ *   get:
+ *     tags: [users]
+ *     security:
+ *       - BearerAuth: []
+ *         in: headers
+ *     summary: Retrieve a list of users within specified coordinates
+ *     description: Retrieve a paginated list of users within specified coordinates with optional search, filter, and sorting options.
+ *     parameters:
+ *       - name: maxDistance
+ *         in: path
+ *         description: User id.
+ *         required: false
+ *         default: 10000
+ *         schema:
+ *           type: string
+ *       - name: search
+ *         in: query
+ *         description: Search keyword to filter users by username, email, etc.
+ *         required: false
+ *         schema:
+ *           type: string
+ *       - name: limit
+ *         in: query
+ *         description: Limit the number of users returned.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 100
+ *       - name: page
+ *         in: query
+ *         description: Page number to retrieve.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - name: userType
+ *         in: query
+ *         description: Filter users by type.
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [SEEKER, HELPER]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserPaginationResponse'
+ *       500:
+ *         description: Server error
+ */
+router.get('/users/near/:maxDistance', getNearbyUsers);
 
 export default router;

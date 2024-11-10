@@ -139,3 +139,42 @@ export async function sendVerificationEmail(req, res, next) {
     next(error);
   }
 }
+
+export const getNearbyUsers = async (req, res, next) => {
+  const { maxDistance = 10000, search = '', userType } = req.params;
+  try {
+    const user = await User.findOne({ id: req.session.user.uid });
+    if (!user) {
+      return next(new AppError('User is not logged in', 403));
+    }
+    const query = {};
+    if (search) {
+      // Use $text for indexed fields or $regex for partial text matches
+      query.$or = [
+        { username: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    if (userType) {
+      query.userType = userType;
+    }
+    const users = await User.aggregate([
+      {
+        $geoNear: {
+          near: user.coordinate,
+          distanceField: 'distance',
+          maxDistance: Number(maxDistance),
+          spherical: true, // Use spherical geometry for calculations
+          query, // Optional: Any additional query criteria
+          sort: { distance: 1 }, // Sort by distance, 1 for ascending (nearest first)
+        },
+      },
+    ]);
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+};

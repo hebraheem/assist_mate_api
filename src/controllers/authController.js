@@ -121,6 +121,7 @@ const saveUserToMongoose = async (req, res, id) => {
     mobile,
     address,
     settings,
+    coordinate,
   } = req.body;
 
   try {
@@ -156,6 +157,7 @@ const saveUserToMongoose = async (req, res, id) => {
       nationality,
       primaryLanguage,
       mobile,
+      coordinate,
       address: { ...defAddress, ...address },
       settings: { ...defSettings, ...settings },
       id,

@@ -69,6 +69,12 @@ const userSchema = new Schema(
       enum: ['SEEKER', 'PROVIDER'],
       default: 'SEEKER',
     },
+    coordinate: {
+      type: { type: String, enum: ['Point'] },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+      },
+    },
     locationAllowed: { type: Boolean, default: true },
     reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
     chats: [{ type: Schema.Types.ObjectId, ref: 'Chat' }],
@@ -86,6 +92,8 @@ userSchema.index({
   firstName: 'text',
   lastName: 'text',
 });
+
+userSchema.index({ coordinate: '2dsphere' });
 
 // Pre-save middleware to hash password before saving
 userSchema.pre('save', async function (next) {

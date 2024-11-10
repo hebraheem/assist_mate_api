@@ -6,6 +6,8 @@ import {
   deleteUser,
   sendVerificationEmail,
   getNearbyUsers,
+  updateFmcToken,
+  getCurrentUser,
 } from '../controllers/userController.js';
 import hasPermission from '../middlewares/accessMiddleware.js';
 
@@ -192,6 +194,61 @@ const router = express.Router();
  *           format: date-time
  *           description: Timestamp of last user update.
  */
+
+/**
+ * @swagger
+ * /users/update-fmc-token:
+ *   patch:
+ *     tags: [users]
+ *     summary: Update user notification token
+ *     description: Update the user's FCM token for push notifications.
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fmcToken:
+ *                 type: string
+ *                 description: The FCM token generated from the client app.
+ *                 example: "your_fmc_token_here"
+ *     responses:
+ *       200:
+ *         description: Device token updated successfully.
+ *       404:
+ *         description: User not found.
+ *       500:
+ *         description: Server error.
+ */
+
+router.patch('/users/update-fmc-token', updateFmcToken);
+
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     tags: [users]
+ *     summary: Get a user
+ *     description: Return current login use.
+ *     security:
+ *       - BearerAuth: []
+ *         in: headers
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/users/me', getCurrentUser);
 
 /**
  * @swagger

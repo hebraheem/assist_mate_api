@@ -32,7 +32,7 @@ const userSchema = new Schema(
     },
     bio: { type: String, default: '' },
     id: { type: String, default: '' },
-    fmcToken: { type: String, default: '' },
+    fmcToken: { type: String, default: null },
     avatar: { type: String, default: '' },
     id: { type: String, default: '' },
     firstName: {

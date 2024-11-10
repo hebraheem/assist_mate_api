@@ -34,7 +34,9 @@ export const getAllUsers = async (req, res, next) => {
     sortDir = 'asc',
   } = req.query;
 
-  const searchCriteria = {};
+  const searchCriteria = {
+    id: { $ne: req.user.user_id },
+  };
 
   if (search) {
     // Use $text for indexed fields or $regex for partial text matches
@@ -142,12 +144,15 @@ export async function sendVerificationEmail(req, res, next) {
 
 export const getNearbyUsers = async (req, res, next) => {
   const { maxDistance = 10000, search = '', userType } = req.params;
+
   try {
     const user = await User.findOne({ id: req.session.user.uid });
     if (!user) {
       return next(new AppError('User is not logged in', 403));
     }
-    const query = {};
+    const query = {
+      id: { $ne: req.user.user_id },
+    };
     if (search) {
       // Use $text for indexed fields or $regex for partial text matches
       query.$or = [
@@ -174,6 +179,41 @@ export const getNearbyUsers = async (req, res, next) => {
       },
     ]);
     res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateFmcToken = async (req, res, next) => {
+  try {
+    const { fmcToken } = req.body;
+    const userId = req.user.user_id;
+
+    // Update the user's device token in the database
+    const user = await User.findOneAndUpdate(
+      { id: userId },
+      { fmcToken },
+      { new: true },
+    );
+    if (!user) {
+      return next(new AppError('User not logged in', 403));
+    }
+
+    res.status(200).json({ message: 'Device token updated successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCurrentUser = async (req, res, next) => {
+  try {
+    const userId = req.user.user_id;
+
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      return next(new AppError('User not logged in', 403));
+    }
+    res.status(200).json({ message: 'User fetched', user });
   } catch (error) {
     next(error);
   }

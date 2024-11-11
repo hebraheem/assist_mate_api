@@ -209,7 +209,7 @@ export const getCurrentUser = async (req, res, next) => {
   try {
     const userId = req.user.user_id;
 
-    const user = await User.findOne({ id: userId });
+    const user = await User.findOne({ id: userId }).populate('requests');
     if (!user) {
       return next(new AppError('User not logged in', 403));
     }

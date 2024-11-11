@@ -39,7 +39,7 @@ const router = express.Router();
  *                 type: string
  *                 format: password
  *                 example: Password123
- *               displayName:
+ *               username:
  *                 type: string
  *                 example: John Doe
  *     responses:

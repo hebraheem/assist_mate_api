@@ -8,6 +8,7 @@ import {
   getNearbyUsers,
   updateFmcToken,
   getCurrentUser,
+  updateUserLocation,
 } from '../controllers/userController.js';
 import hasPermission from '../middlewares/accessMiddleware.js';
 
@@ -225,6 +226,56 @@ const router = express.Router();
  */
 
 router.patch('/users/update-fmc-token', updateFmcToken);
+
+/**
+ * @swagger
+ * /users/update-location:
+ *   patch:
+ *     tags: [users]
+ *     summary: Update user notification token
+ *     description: Update the user's FCM token for push notifications.
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               longitude:
+ *                 type: number
+ *                 description: Current user's longitude
+ *                 example: 49.785544
+ *               latitude:
+ *                 type: number
+ *                 description: Current user's latitude.
+ *                 example: 9.9544
+ *     responses:
+ *       200:
+ *         description: Device token updated successfully.
+ *         content:
+ *          application/json:
+ *           schema:
+ *            type: object
+ *            properties:
+ *             coordinate:
+ *              type: object
+ *              properties:
+ *               type:
+ *                type: string
+ *                default: 'Point'
+ *               coordinates:
+ *                type: array
+ *                items:
+ *                 type: number
+ *                 example: 49.78554
+ *       404:
+ *         description: User not found.
+ *       500:
+ *         description: Server error.
+ */
+router.patch('/users/update-location', updateUserLocation);
 
 /**
  * @swagger

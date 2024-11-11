@@ -218,3 +218,25 @@ export const getCurrentUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateUserLocation = async (req, res, next) => {
+  const { latitude, longitude } = req.body;
+  try {
+    const userId = req.user.user_id;
+
+    const user = await User.findOneAndUpdate(
+      { id: userId },
+      { coordinate: { type: 'Point', coordinates: [longitude, latitude] } },
+      { new: true },
+    );
+    if (!user) {
+      return next(new AppError('User not logged in', 403));
+    }
+    res.status(200).json({
+      message: 'Location saved successfully',
+      coordinate: user.coordinate,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

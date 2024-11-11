@@ -9,6 +9,7 @@ import {
   updateFmcToken,
   getCurrentUser,
   updateUserLocation,
+  updateSelf,
 } from '../controllers/userController.js';
 import hasPermission from '../middlewares/accessMiddleware.js';
 
@@ -340,6 +341,39 @@ router.get('/users/me', getCurrentUser);
  *         description: Server error
  */
 router.patch('/users/update/:id', hasPermission, updateUser);
+
+/**
+ * @swagger
+ * /users/me-update:
+ *   patch:
+ *     tags: [users]
+ *     summary: Update user details
+ *     description: Update a user's display name and email.
+ *     security:
+ *       - BearerAuth: []
+ *         in: headers
+ *     consumes:
+ *       - multipart/form-data
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *         multipart/form-data:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: Successfully updated users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Server error
+ */
+router.patch('/users/me-update', updateSelf);
 
 /**
  * @swagger

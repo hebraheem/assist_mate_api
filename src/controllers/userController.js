@@ -240,3 +240,38 @@ export const updateUserLocation = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateSelf = async (req, res, next) => {
+  const id = req.user.user_id;
+  const body = structuredClone(req.body);
+  const currentUser = auth.currentUser;
+  if (currentUser?.email !== body?.email) {
+    body.emailVerified = false;
+    body.verified = false;
+  }
+  delete body.id;
+  try {
+    const firebaseUser = admin.auth().updateUser(id, {
+      ...body,
+    });
+
+    if (body?.password) {
+      // Hash password after saving to firebase
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(body.password, salt);
+      body.password = hashedPassword;
+    }
+    const authUser = User.findOneAndUpdate({ id }, body, {
+      new: true,
+      runValidators: true,
+    });
+    // eslint-disable-next-line no-unused-vars
+    const [_, newUser] = await Promise.all([firebaseUser, authUser]);
+    res.status(200).json({
+      message: 'User updated successfully',
+      user: newUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

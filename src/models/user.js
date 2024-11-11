@@ -95,6 +95,12 @@ userSchema.index({
 
 userSchema.index({ coordinate: '2dsphere' });
 
+userSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
+
+userSchema.set('toJSON', { virtuals: true });
+
 // Pre-save middleware to hash password before saving
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {

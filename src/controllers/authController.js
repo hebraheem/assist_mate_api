@@ -137,7 +137,7 @@ const saveUserToMongoose = async (req, _res, id) => {
     const exist = await User.findOne({ id });
     if (exist) {
       // silently return if user already exists
-      return;
+      return exist;
     }
     const defAddress = {
       street: '',

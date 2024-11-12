@@ -176,6 +176,22 @@ router.post('/confirm-reset-password', confirmResetPassword);
  *   post:
  *     tags: [auth]
  *     summary: Login using Google and return a Firebase token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 email:
+ *                   type: string
+ *                   example: "text@example.com"
+ *                 password:
+ *                   type: string
+ *                   example: "Password-123"
+ *                 id:
+ *                   type: string
+ *                   example: "firebase-id-token"
  *     responses:
  *       200:
  *         description: Login successful, returns a token.
@@ -184,7 +200,13 @@ router.post('/confirm-reset-password', confirmResetPassword);
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 email:
+ *                   type: string
+ *                   example: "text@example.com"
+ *                 password:
+ *                   type: string
+ *                   example: "Password-123"
+ *                 id:
  *                   type: string
  *                   example: "firebase-id-token"
  *       400:

@@ -103,11 +103,8 @@ export const loginUser = async (req, res, next) => {
 };
 
 export const googleLogin = async (req, res, next) => {
-  const { body } = req;
   try {
-    const exist = await User.findOne({ id: body.id });
-    if (exist) return;
-    const user = await saveUserToMongoose(req, res, res?.id);
+    const user = await saveUserToMongoose(req, res, req.body?.id);
     req.session.user = user;
     res.status(200).json({
       message: 'Google login successful',
@@ -121,7 +118,7 @@ export const googleLogin = async (req, res, next) => {
   }
 };
 
-const saveUserToMongoose = async (req, res, id) => {
+const saveUserToMongoose = async (req, _res, id) => {
   const {
     username,
     firstName,

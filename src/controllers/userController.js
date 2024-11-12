@@ -1,9 +1,10 @@
 import bcrypt from 'bcryptjs/dist/bcrypt.js';
-import { admin, auth } from '../config/firebase.cjs';
+import { admin } from '../config/firebase.cjs';
 import User from '../models/user.js';
 import AppError from '../utils/appError.js';
 import PaginatedQuery from '../utils/paginatedQuery.js';
-import { sendEmailVerification } from 'firebase/auth';
+import TransportEmail from '../tasks/sendMail.js';
+import { asyncFn } from '../utils/helpers.js';
 
 export const getUser = async (req, res, next) => {
   const { id } = req.params;
@@ -78,7 +79,7 @@ export const updateUser = async (req, res, next) => {
   const { id } = req.params; // User ID from the URL
 
   const body = structuredClone(req.body);
-  const currentUser = auth.currentUser;
+  const currentUser = await admin.auth().getUser(req.user.user_id);
   if (currentUser?.email !== body?.email) {
     body.emailVerified = false;
     body.verified = false;
@@ -127,16 +128,20 @@ export const deleteUser = async (req, res) => {
 };
 
 export async function sendVerificationEmail(req, res, next) {
-  const user = auth.currentUser;
-  if (!user) next(new AppError('No user is currently signed in', 400));
   try {
-    await sendEmailVerification(user, {
-      url: messageChannelUrl,
-      handleCodeInApp: true,
-    });
-    res.status(200).json({
-      message: 'Verification email sent',
-    });
+    const userRecord = await admin.auth().getUser(req.user.user_id);
+    await admin
+      .auth()
+      .generateEmailVerificationLink(userRecord.email, {
+        url: messageChannelUrl,
+      })
+      .then(async (verificationLink) => {
+        await new TransportEmail(
+          userRecord,
+          verificationLink,
+        ).sendVerifyEmail();
+        res.status(200).json({ message: 'Verification email sent' });
+      });
   } catch (error) {
     next(error);
   }
@@ -244,7 +249,7 @@ export const updateUserLocation = async (req, res, next) => {
 export const updateSelf = async (req, res, next) => {
   const id = req.user.user_id;
   const body = structuredClone(req.body);
-  const currentUser = auth.currentUser;
+  const currentUser = await admin.auth().getUser(req.user.user_id);
   if (currentUser?.email !== body?.email) {
     body.emailVerified = false;
     body.verified = false;
@@ -275,3 +280,10 @@ export const updateSelf = async (req, res, next) => {
     next(error);
   }
 };
+
+export const verifyUser = asyncFn(async (req, res) => {
+  const user = await User.findOne(req.user.user_id);
+  user.emailVerified = true;
+  await user.save();
+  res.status(200).json({ status: 'Ok', user });
+});

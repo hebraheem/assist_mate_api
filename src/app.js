@@ -6,6 +6,9 @@ import compression from 'compression';
 import morgan from 'morgan';
 import session from 'express-session';
 import dotenv from 'dotenv';
+import path from 'path';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
 
 import errorHandler from './middlewares/errorHandler.js';
 import { handleNotFoundError } from './middlewares/errorUtils.js';
@@ -21,6 +24,9 @@ import checkOwnership from './middlewares/allowOwner.js';
 const app = express();
 dotenv.config();
 
+const __dirname = import.meta.dirname;
+
+app.use(express.static(path.join(__dirname, '..', 'public')));
 // session
 app.use(
   session({
@@ -44,6 +50,15 @@ app.use(compression());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan('dev'));
+app.use(mongoSanitize()); // prevent against NOSQL injection
+app.use(xss()); // prevent against xss attacks
+
+// redirect to swagger UI
+app.get('/', (req, res) => {
+  if (req.url === '/') {
+    res.redirect('/api-docs');
+  }
+});
 
 // Swagger Docs
 setupSwaggerDocs(app);

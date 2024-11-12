@@ -130,3 +130,5 @@ dist
 .pnp.*
 
 assist-mate-3fbbf-firebase-adminsdk-htbjf-d19714a887.json
+
+build.cjs

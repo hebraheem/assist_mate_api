@@ -53,6 +53,7 @@ const userSchema = new Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
     },
+    emailVerified: { type: Boolean, default: false },
     password: {
       type: String,
       required: [true, 'Password is required'],

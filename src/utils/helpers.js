@@ -25,3 +25,9 @@ export const authUser = () => {
     auth.currentUser ?? JSON.parse(localStorage.getItem('userCredential')).user
   );
 };
+
+export const asyncFn = (fn) => {
+  return function (req, res, next) {
+    fn(req, res, next).catch(next);
+  };
+};

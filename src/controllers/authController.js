@@ -1,16 +1,13 @@
 import {
   browserLocalPersistence,
-  sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
-  signInWithPopup,
 } from 'firebase/auth';
-import { admin, auth, googleAuth } from '../config/firebase.cjs';
+import { admin, auth } from '../config/firebase.cjs';
 import localStorage from '../utils/localStorage.js';
 import AppError from '../utils/appError.js';
 import User from '../models/user.js';
-
-export const messageChannelUrl = `https://assistmate.netlify.app/action`;
+import TransportEmail from '../tasks/sendMail.js';
 
 export const createUser = async (req, res, next) => {
   try {
@@ -36,14 +33,34 @@ export const createUser = async (req, res, next) => {
 export const resetPassword = async (req, res, next) => {
   const { email } = req.body;
 
+  if (!email) {
+    return next(new AppError('Email not provided', 400));
+  }
+
   try {
-    await sendPasswordResetEmail(auth, email, {
-      url: messageChannelUrl,
-      handleCodeInApp: true,
-    });
+    const resetLink = await admin.auth().generatePasswordResetLink(email);
+    await new TransportEmail(
+      { email, name: email },
+      resetLink,
+    ).sendPasswordReset();
     return res.status(200).json({ message: 'Password reset email sent' });
   } catch (error) {
     return next(error);
+  }
+};
+
+export const confirmResetPassword = async (req, res, next) => {
+  const { oobCode, newPassword } = req.body;
+
+  if (!oobCode || !newPassword) {
+    return next(new AppError('oobCode and newPassword are required', 400));
+  }
+
+  try {
+    await admin.auth().confirmPasswordReset(oobCode, newPassword);
+    res.status(200).json({ message: 'Password reset successfully.' });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -86,23 +103,18 @@ export const loginUser = async (req, res, next) => {
 };
 
 export const googleLogin = async (req, res, next) => {
+  const { body } = req;
   try {
-    await setPersistence(auth, browserLocalPersistence).then(async () => {
-      const userCredential = await signInWithPopup(auth, googleAuth);
-      const user = userCredential.user;
-
-      // Get ID token after successful login
-      const idToken = await user.getIdToken();
-      await saveUserToMongoose(req, res, user?.uid);
-      req.session.user = user;
-      res.status(200).json({
-        message: 'Google login successful',
-        idToken,
-        user: {
-          email: user.email,
-          displayName: user.displayName,
-        },
-      });
+    const exist = await User.findOne({ id: body.id });
+    if (exist) return;
+    const user = await saveUserToMongoose(req, res, res?.id);
+    req.session.user = user;
+    res.status(200).json({
+      message: 'Google login successful',
+      user: {
+        email: user.email,
+        displayName: user.displayName,
+      },
     });
   } catch (error) {
     return next(error);
@@ -185,18 +197,3 @@ export const logout = async (req, res, next) => {
     });
   });
 };
-
-export async function verifyToken(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    return next('Token is required', 403);
-  }
-
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    req.user = decodedToken;
-    next();
-  } catch (error) {
-    next(error);
-  }
-}

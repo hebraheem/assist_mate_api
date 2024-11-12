@@ -6,6 +6,7 @@ import {
   loginUser,
   resetPassword,
   logout,
+  confirmResetPassword,
 } from '../controllers/authController.js';
 
 const router = express.Router();
@@ -139,6 +140,35 @@ router.post('/login', loginUser);
  *         description: Internal server error.
  */
 router.post('/reset-password', resetPassword);
+
+/**
+ * @swagger
+ * /auth/confirm-reset-password:
+ *   post:
+ *     tags: [auth]
+ *     summary: Request password reset
+ *     description: Sends a password reset link to the provided email.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newPassword:
+ *                 type: string
+ *               oobCode:
+ *                 type: string
+ *
+ *     responses:
+ *       200:
+ *         description: Password reset link sent successfully.
+ *       400:
+ *         description: Invalid email or email not found.
+ *       500:
+ *         description: Internal server error.
+ */
+router.post('/confirm-reset-password', confirmResetPassword);
 
 /**
  * @swagger

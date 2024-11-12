@@ -5,7 +5,7 @@ import PaginatedQuery from '../utils/paginatedQuery.js';
 
 export const createRequest = async (req, res, next) => {
   try {
-    const user = await User.findOne({ id: req.session.user.uid });
+    const user = await User.findOne({ id: req.user.user_id });
     if (!user) {
       return next(new AppError('User not signed in', 403));
     }

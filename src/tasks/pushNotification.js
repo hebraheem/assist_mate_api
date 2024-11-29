@@ -1,4 +1,4 @@
-import { setVapidDetails, sendNotification } from 'web-push';
+import webPush from 'web-push';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -8,7 +8,7 @@ const vapidKeys = {
   privateKey: process.env.VAPID_PRIVATE_KEY,
 };
 
-setVapidDetails(
+webPush.setVapidDetails(
   'mailto:support@assistmate.com',
   vapidKeys.publicKey,
   vapidKeys.privateKey,
@@ -20,8 +20,9 @@ setVapidDetails(
  * @param {Object} dataToSend - The data to include in the notification.
  * @returns {Promise} - A promise that resolves when the notification is sent.
  */
-function sendPushNotification(subscription, dataToSend) {
-  return sendNotification(JSON.parse(subscription), JSON.stringify(dataToSend))
+export default function sendPushNotification(subscription, dataToSend) {
+  return webPush
+    .sendNotification(JSON.parse(subscription), JSON.stringify(dataToSend))
     .then((response) => {
       // eslint-disable-next-line no-console
       console.log('Notification sent successfully:', response);
@@ -30,10 +31,6 @@ function sendPushNotification(subscription, dataToSend) {
     .catch((error) => {
       // eslint-disable-next-line no-console
       console.error('Error sending notification:', error);
-      throw error;
+      return error;
     });
 }
-
-export default {
-  sendPushNotification,
-};

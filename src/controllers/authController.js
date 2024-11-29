@@ -78,13 +78,17 @@ export const loginUser = async (req, res, next) => {
         email,
         password,
       );
+
       if (!userCredential) {
-        return next(new AppError('Invalid email or password'));
+        return next(new AppError('Invalid email or password', 404));
       }
       const user = userCredential.user;
       // Send user details and token as response
       const idToken = await user.getIdToken();
-
+      const userAvailable = await User.findOne({ id: user.uid });
+      if (!userAvailable) {
+        return next(new AppError('User not found.', 400));
+      }
       res.status(200).json({
         message: 'Login successful',
         idToken,

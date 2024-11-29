@@ -13,14 +13,19 @@ const sendErrorResponse = (err, res) => {
 
 // Main error-handling middleware
 const errorHandler = (err, req, res, next) => {
-  // If error is not an instance of AppError, make it one
+  if (err.message.includes('auth') && err.message.includes('Firebase')) {
+    err.message = 'Invalid User login Credentials';
+    err.statusCode = 401;
+  }
   if (!(err instanceof AppError)) {
+    // If error is not an instance of AppError, make it one
     err = new AppError(err.message || 'Server Error', 500);
   }
   // Check the environment
   if (process.env.NODE_ENV === 'development') {
     // Detailed error for development
     console.error('Error:', err); // Log the full error
+
     return res.status(err.statusCode || 500).json({
       status: err.status || 'error',
       message: err.message,

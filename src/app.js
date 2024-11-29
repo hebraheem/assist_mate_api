@@ -6,9 +6,10 @@ import compression from 'compression';
 import morgan from 'morgan';
 import session from 'express-session';
 import dotenv from 'dotenv';
-import path from 'path';
+import path, { dirname } from 'path';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
+import { fileURLToPath } from 'url';
 
 import errorHandler from './middlewares/errorHandler.js';
 import { handleNotFoundError } from './middlewares/errorUtils.js';
@@ -24,7 +25,8 @@ import checkOwnership from './middlewares/allowOwner.js';
 const app = express();
 dotenv.config();
 
-const __dirname = import.meta.dirname;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 // session
@@ -39,7 +41,7 @@ app.use(
       secure: false, // Set to true if using https (can be toggled in production environments)
     },
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI, // MongoDB URL
+      mongoUrl: process.env.MONGO_URI,
     }),
   }),
 );

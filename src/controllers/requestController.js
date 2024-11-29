@@ -1,5 +1,6 @@
 import Request from '../models/request.js';
 import User from '../models/user.js';
+import sendPushNotification from '../tasks/pushNotification.js';
 import AppError from '../utils/appError.js';
 import PaginatedQuery from '../utils/paginatedQuery.js';
 
@@ -14,12 +15,22 @@ export const createRequest = async (req, res, next) => {
       user: user._id,
       createdBy: user._id,
     });
+
     await request.save();
     const createdRequest = request.toObject();
-
     await User.findByIdAndUpdate(user._id, {
       $addToSet: { requests: request._id },
     });
+
+    const tempResolver = await User.findOne({
+      id: req.body.tempResolvers?.[0],
+    });
+    if (tempResolver?.fmcToken) {
+      sendPushNotification(user.fmcToken, {
+        title: req.body.title,
+        body: req.body.description,
+      });
+    }
 
     res.status(200).json({
       request: createdRequest,

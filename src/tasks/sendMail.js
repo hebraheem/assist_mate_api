@@ -1,8 +1,9 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import pug from 'pug';
-import path from 'path';
+import path, { dirname } from 'path';
 import { convert } from 'html-to-text';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 export default class TransportEmail {
@@ -36,19 +37,20 @@ export default class TransportEmail {
   createTransport() {
     if (process.env.NODE_ENV === 'production') {
       return nodemailer.createTransport({
-        service: 'sendGrid',
-        auth: {
-          user: process.env.SEND_GRID_USERNAME,
-          pass: process.env.SEND_GRID_PASSWORD,
-        },
-      });
-    } else {
-      return nodemailer.createTransport({
         host: process.env.TRANSPORT_HOST,
         port: process.env.TRANSPORT_PORT,
         auth: {
           user: process.env.TRANSPORT_EMAIL,
           pass: process.env.TRANSPORT_PASS,
+        },
+      });
+    } else {
+      return nodemailer.createTransport({
+        host: process.env.TRANSPORT_HOST_LOCAL,
+        port: process.env.TRANSPORT_PORT_LOCAL,
+        auth: {
+          user: process.env.TRANSPORT_EMAIL_LOCAL,
+          pass: process.env.TRANSPORT_PASS_LOCAL,
         },
       });
     }
@@ -61,9 +63,11 @@ export default class TransportEmail {
    * @private
    */
   async send(subject, template) {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
     const html = pug.renderFile(
       path.join(
-        `${import.meta.dirname}`,
+        `${__dirname}`,
         '..',
         '..',
         'public',

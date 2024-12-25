@@ -15,12 +15,14 @@ import errorHandler from './middlewares/errorHandler.js';
 import { handleNotFoundError } from './middlewares/errorUtils.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
 import authenticateFirebaseToken from './middlewares/authMiddleware.js';
 import setupSwaggerDocs from './config/swagger.js';
 import MongoStore from 'connect-mongo';
 import Request from './models/request.js';
 import checkOwnership from './middlewares/allowOwner.js';
+import Notification from './models/notification.js';
 
 const app = express();
 dotenv.config();
@@ -69,6 +71,12 @@ setupSwaggerDocs(app);
 app.use('/auth', authRoutes);
 app.use('/', authenticateFirebaseToken, userRoutes);
 app.use('/', authenticateFirebaseToken, checkOwnership(Request), requestRoutes);
+app.use(
+  '/',
+  authenticateFirebaseToken,
+  checkOwnership(Notification),
+  notificationRoutes,
+);
 
 // 404 Handler
 app.use(handleNotFoundError); // Catch any non-existing routes

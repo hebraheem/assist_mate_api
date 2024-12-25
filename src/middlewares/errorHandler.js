@@ -14,12 +14,13 @@ const sendErrorResponse = (err, res) => {
 // Main error-handling middleware
 const errorHandler = (err, req, res, _next) => {
   // Handle Mongoose validation errors
+  let errorMsg = '';
   if (err.name === 'ValidationError') {
-    const errors = Object.values(err.errors).map((error) => ({
-      field: error.path,
-      message: error.message,
-    }));
-    err = new AppError(`Validation failed: ${errors}`, 400);
+    Object.values(err.errors).forEach((error) => {
+      errorMsg += `${error?.properties?.message ?? error.message} \n`;
+    });
+
+    err = new AppError(`Validation failed: ${errorMsg}`, 400);
   }
 
   // Handle invalid ObjectId or type casting

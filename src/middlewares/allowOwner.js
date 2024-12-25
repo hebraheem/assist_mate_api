@@ -12,9 +12,10 @@ const checkOwnership = (Model, key = 'user') => {
       req.queryFilter = { createdBy: user._id };
 
       if (
-        req.method === 'PATCH' ||
-        req.method === 'DELETE' ||
-        req.method === 'PUT'
+        (req.method === 'PATCH' ||
+          req.method === 'DELETE' ||
+          req.method === 'PUT') &&
+        req.params.id
       ) {
         const documentId = req.params.id;
 

@@ -19,7 +19,7 @@ const requestSchema = new Schema(
     },
     dueDateTime: {
       type: Date,
-      required: true,
+      required: false,
     },
     status: {
       type: String,

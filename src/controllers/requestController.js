@@ -10,6 +10,14 @@ export const createRequest = async (req, res, next) => {
     if (!user) {
       return next(new AppError('User not signed in', 403));
     }
+
+    const tempResolver = await User.findOne({
+      _id: req.body.tempResolvers?.[0],
+    });
+
+    if (!tempResolver) {
+      return next(new AppError('Temporary resolver not found', 401));
+    }
     const request = new Request({
       ...req.body,
       user: user._id,
@@ -22,13 +30,11 @@ export const createRequest = async (req, res, next) => {
       $addToSet: { requests: request._id },
     });
 
-    const tempResolver = await User.findOne({
-      id: req.body.tempResolvers?.[0],
-    });
     if (tempResolver?.fmcToken) {
-      sendPushNotification(user.fmcToken, {
+      await sendPushNotification(tempResolver.fmcToken, {
         title: req.body.title,
         body: req.body.description,
+        requestId: createdRequest._id,
       });
     }
 

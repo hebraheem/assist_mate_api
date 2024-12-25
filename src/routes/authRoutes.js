@@ -83,7 +83,7 @@ router.post(
  *                 example: user@example.com
  *               password:
  *                 type: string
- *                 example: Password-123
+ *                 example: Password123
  *         application/x-www-form-urlencoded:
  *           schema:
  *             type: object
@@ -188,7 +188,7 @@ router.post('/confirm-reset-password', confirmResetPassword);
  *                   example: "text@example.com"
  *                 password:
  *                   type: string
- *                   example: "Password-123"
+ *                   example: "Password123"
  *                 id:
  *                   type: string
  *                   example: "firebase-id-token"
@@ -205,7 +205,7 @@ router.post('/confirm-reset-password', confirmResetPassword);
  *                   example: "text@example.com"
  *                 password:
  *                   type: string
- *                   example: "Password-123"
+ *                   example: "Password123"
  *                 id:
  *                   type: string
  *                   example: "firebase-id-token"

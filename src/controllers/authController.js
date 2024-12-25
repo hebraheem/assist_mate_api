@@ -183,7 +183,7 @@ const saveUserToMongoose = async (req, _res, id) => {
     const userData = newUser.toObject();
     return userData;
   } catch (err) {
-    throw new Error(err);
+    throw err;
   }
 };
 

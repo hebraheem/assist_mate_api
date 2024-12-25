@@ -132,9 +132,7 @@ export async function sendVerificationEmail(req, res, next) {
     const userRecord = await admin.auth().getUser(req.user.user_id);
     await admin
       .auth()
-      .generateEmailVerificationLink(userRecord.email, {
-        url: messageChannelUrl,
-      })
+      .generateEmailVerificationLink(userRecord.email)
       .then(async (verificationLink) => {
         await new TransportEmail(
           userRecord,

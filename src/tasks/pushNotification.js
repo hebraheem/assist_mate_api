@@ -20,17 +20,18 @@ webPush.setVapidDetails(
  * @param {Object} dataToSend - The data to include in the notification.
  * @returns {Promise} - A promise that resolves when the notification is sent.
  */
-export default function sendPushNotification(subscription, dataToSend) {
-  return webPush
-    .sendNotification(JSON.parse(subscription), JSON.stringify(dataToSend))
-    .then((response) => {
-      // eslint-disable-next-line no-console
-      console.log('Notification sent successfully:', response);
-      return response;
-    })
-    .catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error('Error sending notification:', error);
-      return error;
-    });
+export default async function sendPushNotification(subscription, dataToSend) {
+  try {
+    const response = await webPush.sendNotification(
+      JSON.parse(subscription),
+      JSON.stringify(dataToSend),
+    );
+    // eslint-disable-next-line no-console
+    console.log('Notification sent successfully:', response);
+    return response;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error sending notification:', error);
+    return error;
+  }
 }

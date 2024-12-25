@@ -37,14 +37,32 @@ export default class TransportEmail {
   createTransport() {
     if (process.env.NODE_ENV === 'production') {
       return nodemailer.createTransport({
-        host: process.env.TRANSPORT_HOST,
-        port: process.env.TRANSPORT_PORT,
+        host: 'smtp.sendgrid.net',
+        port: 587,
+        secure: false,
         auth: {
-          user: process.env.TRANSPORT_EMAIL,
-          pass: process.env.TRANSPORT_PASS,
+          user: process.env.SEND_GRID_USERNAME,
+          pass: process.env.SEND_GRID_PASSWORD,
         },
       });
+      // return nodemailer.createTransport({
+      //   host: process.env.TRANSPORT_HOST,
+      //   port: process.env.TRANSPORT_PORT,
+      //   auth: {
+      //     user: process.env.TRANSPORT_EMAIL,
+      //     pass: process.env.TRANSPORT_PASS,
+      //   },
+      // });
     } else {
+      // return nodemailer.createTransport({
+      //   host: 'smtp.sendgrid.net',
+      //   port: 587,
+      //   secure: false,
+      //   auth: {
+      //     user: process.env.SEND_GRID_USERNAME,
+      //     pass: process.env.SEND_GRID_PASSWORD,
+      //   },
+      // });
       return nodemailer.createTransport({
         host: process.env.TRANSPORT_HOST_LOCAL,
         port: process.env.TRANSPORT_PORT_LOCAL,

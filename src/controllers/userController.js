@@ -255,6 +255,7 @@ export const updateSelf = async (req, res, next) => {
   delete body.id;
   try {
     const firebaseUser = admin.auth().updateUser(id, {
+      photoURL: body.avatar,
       ...body,
     });
 
@@ -266,7 +267,7 @@ export const updateSelf = async (req, res, next) => {
     }
     const authUser = User.findOneAndUpdate({ id }, body, {
       new: true,
-      runValidators: true,
+      runValidators: false,
     });
     // eslint-disable-next-line no-unused-vars
     const [_, newUser] = await Promise.all([firebaseUser, authUser]);

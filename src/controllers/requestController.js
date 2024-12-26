@@ -205,32 +205,6 @@ const sendPushAndCreateNotifications = async (
   await new Notification(notification).save();
 };
 
-export const getTopRequests = async (req, res, next) => {
-  const user = req.user;
-  const { maxDistance = 10000 } = req.params;
-
-  try {
-    const requests = await Request.aggregate([
-      {
-        $geoNear: {
-          near: user.coordinate,
-          distanceField: 'distance',
-          maxDistance: Number(maxDistance),
-          spherical: true, // Use spherical geometry for calculations
-          query: {}, // Optional: Any additional query criteria
-          sort: { distance: 1 }, // Sort by distance, 1 for ascending (nearest first)
-        },
-      },
-    ]).limit(20);
-    res.status(200).json({
-      requests,
-      message: 'Requests fetched successfully',
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const getNearbyRequests = async (req, res, next) => {
   const { latitude, longitude, distance = 10 } = req.query; // Distance in km, default 10 km
 
@@ -252,7 +226,9 @@ export const getNearbyRequests = async (req, res, next) => {
           $maxDistance: distanceInMeters, // Max distance in meters
         },
       },
-    }).exec();
+    })
+      .limit(req.params?.limit)
+      .exec();
 
     res.status(200).json({
       requests: nearbyRequests,
@@ -261,4 +237,17 @@ export const getNearbyRequests = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const getTopRequests = async (req, res, next) => {
+  const user = req.user;
+  req.params.limit = 20;
+  if (!req.params?.maxDistance || isNaN(req.params?.maxDistance)) {
+    req.params.maxDistance = 100000;
+  }
+  if (!req.query?.latitude) req.query.latitude = user.coordinate.coordinates[1];
+  if (!req.query?.longitude)
+    req.query.longitude = user.coordinate.coordinates[1];
+  if (!req.query?.distance) req.query.distance = req.params.maxDistance / 1000;
+  return getNearbyRequests(req, res, next);
 };

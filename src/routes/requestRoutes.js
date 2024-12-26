@@ -115,6 +115,20 @@ const router = express.Router();
  *       - BearerAuth: []
  *         in: headers
  *     parameters:
+ *       - in: query
+ *         name: latitude
+ *         required: false
+ *         schema:
+ *           type: number
+ *           example: 12.9716
+ *         description: Latitude of the user's current location
+ *       - in: query
+ *         name: longitude
+ *         required: false
+ *         schema:
+ *           type: number
+ *           example: 77.5946
+ *         description: Longitude of the user's current location
  *       - name: maxDistance
  *         in: path
  *         description: distance to filter within.

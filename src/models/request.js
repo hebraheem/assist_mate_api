@@ -52,14 +52,8 @@ const requestSchema = new Schema(
       },
     ],
     coordinate: {
-      latitude: {
-        type: Number,
-        default: null,
-      },
-      longitude: {
-        type: Number,
-        default: null,
-      },
+      type: { type: String, enum: ['Point'], default: 'Point' },
+      coordinates: { type: [Number], required: true }, // [longitude, latitude]
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -70,6 +64,7 @@ const requestSchema = new Schema(
   { timestamps: true },
 );
 
+requestSchema.index({ coordinate: '2dsphere' });
 requestSchema.index({
   title: 'text',
   description: 'text',

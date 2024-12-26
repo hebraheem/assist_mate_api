@@ -2,8 +2,10 @@ import express from 'express';
 import {
   createRequest,
   deleteRequest,
+  getNearbyRequests,
   getRequest,
   getRequests,
+  getTopRequests,
   updateRequest,
 } from '../controllers/requestController.js';
 
@@ -94,19 +96,86 @@ const router = express.Router();
  *         coordinate:
  *           type: object
  *           properties:
- *             latitude:
- *               type: number
- *               nullable: true
- *               description: Latitude coordinate.
- *             longitude:
- *               type: number
- *               nullable: true
- *               description: Longitude coordinate.
+ *            type:
+ *             type: string
+ *             default: 'Point'
  *         createdAt:
  *           type: string
  *           format: date-time
  *           description: Timestamp when the request was created.
  */
+
+/**
+ * @swagger
+ * /requests/top-20/{maxDistance}:
+ *   get:
+ *     summary: Get all requests within specified distance default to 10KM
+ *     tags: [request]
+ *     security:
+ *       - BearerAuth: []
+ *         in: headers
+ *     parameters:
+ *       - name: maxDistance
+ *         in: path
+ *         description: distance to filter within.
+ *         required: false
+ *         schema:
+ *           type: number
+ *           default: 10000
+ *     responses:
+ *       200:
+ *         description: List of requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PaginationResponse'
+ */
+router.get('/requests/top-20/:maxDistance', getTopRequests);
+
+/**
+ * @swagger
+ * /requests/near:
+ *   get:
+ *     summary: Get all requests
+ *     tags: [request]
+ *     security:
+ *       - BearerAuth: []
+ *         in: headers
+ *     parameters:
+ *       - in: query
+ *         name: latitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *           example: 12.9716
+ *         description: Latitude of the user's current location
+ *       - in: query
+ *         name: longitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *           example: 77.5946
+ *         description: Longitude of the user's current location
+ *       - in: query
+ *         name: distance
+ *         required: false
+ *         schema:
+ *           type: number
+ *           example: 10
+ *         description: Radius in kilometers (default is 10 km)
+ *     responses:
+ *       200:
+ *         description: List of requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PaginationResponse'
+ */
+router.get('/requests/near', getNearbyRequests);
 
 /**
  * @swagger
@@ -118,6 +187,13 @@ const router = express.Router();
  *       - BearerAuth: []
  *         in: headers
  *     parameters:
+ *       - name: history
+ *         in: query
+ *         description: Search keyword to filter users by title, and description.
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           default: false
  *       - name: search
  *         in: query
  *         description: Search keyword to filter users by title, and description.

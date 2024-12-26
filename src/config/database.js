@@ -1,5 +1,6 @@
 import { connect } from 'mongoose';
 import dotenv from 'dotenv';
+// import Request from '../models/request.js';
 // import User from '../models/user.js';
 
 dotenv.config();
@@ -7,7 +8,7 @@ dotenv.config();
 const connectDB = async () => {
   try {
     await connect(process.env.MONGO_URI);
-    // User.on('index', (error) => {
+    // Request.on('index', (error) => {
     //   if (error) {
     //     console.error('Error creating index:', error);
     //   } else {

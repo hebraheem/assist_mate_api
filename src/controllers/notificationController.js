@@ -17,7 +17,6 @@ export const getNotifications = async (req, res, next) => {
   const orderBy = { [sort]: sortDir };
   const copyQuery = { ...req };
 
-  delete copyQuery.queryFilter;
   try {
     await new PaginatedQuery({
       req: copyQuery,

@@ -7,14 +7,12 @@ import PaginatedQuery from '../utils/paginatedQuery.js';
 
 export const createRequest = async (req, res, next) => {
   try {
-    const user = await User.findOne({ id: req.user.user_id });
+    const user = req.user;
     if (!user) {
       return next(new AppError('User not signed in', 403));
     }
 
-    const tempResolver = await User.findOne({
-      _id: req.body.tempResolvers?.[0],
-    });
+    const tempResolver = await User.findById(req.body.tempResolvers?.[0]);
 
     if (!tempResolver) {
       return next(new AppError('Temporary resolver not found', 401));
@@ -50,12 +48,6 @@ export const createRequest = async (req, res, next) => {
 };
 
 export const getRequests = async (req, res, next) => {
-  //   const select = {
-  //     id: true,
-  //     firstName: true,
-  //     lastName: true,
-  //     email: true,
-  //   };
   const {
     search = '',
     category,
@@ -63,10 +55,16 @@ export const getRequests = async (req, res, next) => {
     sortDir = 'asc',
     status,
     user,
+    history = false,
   } = req.query;
 
   const searchCriteria = {};
 
+  if (!history || history === 'false') {
+    searchCriteria.createdBy = { $ne: req.user._id };
+  } else {
+    searchCriteria.createdBy = req.user._id;
+  }
   if (search) {
     searchCriteria.$or = [
       { title: { $regex: search, $options: 'i' } },
@@ -94,7 +92,7 @@ export const getRequests = async (req, res, next) => {
       model: 'Request',
       where: searchCriteria,
       orderBy,
-      include: [{ path: 'user', select: 'firstName lastName id' }],
+      include: [{ path: 'user', select: 'firstName lastName id avatar' }],
       //   select,
     }).performQuery();
   } catch (error) {
@@ -123,8 +121,8 @@ export const updateRequest = async (req, res, next) => {
       ? { resolver: req.body.resolver, status: 'IN_PROGRESS' }
       : req.body;
 
-    const [user, request] = await Promise.all([
-      User.findOne({ id: req.user.user_id }),
+    const user = req.user;
+    const [request] = await Promise.all([
       Request.findByIdAndUpdate(req.params.id, updateData, {
         new: true,
         runValidators: !req.body.resolver,
@@ -205,4 +203,62 @@ const sendPushAndCreateNotifications = async (
     user: resolver._id,
   });
   await new Notification(notification).save();
+};
+
+export const getTopRequests = async (req, res, next) => {
+  const user = req.user;
+  const { maxDistance = 10000 } = req.params;
+
+  try {
+    const requests = await Request.aggregate([
+      {
+        $geoNear: {
+          near: user.coordinate,
+          distanceField: 'distance',
+          maxDistance: Number(maxDistance),
+          spherical: true, // Use spherical geometry for calculations
+          query: {}, // Optional: Any additional query criteria
+          sort: { distance: 1 }, // Sort by distance, 1 for ascending (nearest first)
+        },
+      },
+    ]).limit(20);
+    res.status(200).json({
+      requests,
+      message: 'Requests fetched successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getNearbyRequests = async (req, res, next) => {
+  const { latitude, longitude, distance = 10 } = req.query; // Distance in km, default 10 km
+
+  if (!latitude || !longitude) {
+    return next(new AppError('Latitude and longitude are required', 400));
+  }
+
+  try {
+    // Convert distance from km to meters (1 km = 1000 meters)
+    const distanceInMeters = distance * 1000;
+
+    const nearbyRequests = await Request.find({
+      coordinate: {
+        $nearSphere: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [Number(longitude), Number(latitude)], // [longitude, latitude]
+          },
+          $maxDistance: distanceInMeters, // Max distance in meters
+        },
+      },
+    }).exec();
+
+    res.status(200).json({
+      requests: nearbyRequests,
+      message: 'Nearby requests fetched successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
 };

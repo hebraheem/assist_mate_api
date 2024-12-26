@@ -1,15 +1,13 @@
-import User from '../models/user.js';
 import AppError from '../utils/appError.js';
 
 // Dynamic ownership middleware
 const checkOwnership = (Model, key = 'user') => {
   return async (req, res, next) => {
     try {
-      const user = await User.findOne({ id: req.user.user_id });
+      const user = req.user;
       if (!user) {
         return next(new AppError('User not logged in', 403));
       }
-      req.queryFilter = { createdBy: user._id };
 
       if (
         (req.method === 'PATCH' ||
@@ -18,7 +16,7 @@ const checkOwnership = (Model, key = 'user') => {
         req.params.id
       ) {
         const documentId = req.params.id;
-
+        req.queryFilter = { createdBy: user._id };
         // Find the document by ID in the specified model
         const document = await Model.findById(documentId);
 

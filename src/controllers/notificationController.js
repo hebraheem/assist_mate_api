@@ -74,10 +74,7 @@ export const updateNotificationStatus = async (req, res, next) => {
 
 export const readAllNotifications = async (req, res, next) => {
   try {
-    const result = await Notification.updateMany(
-      { _id: { $in: req.body.ids } },
-      { $set: { read: true } },
-    );
+    const result = await Notification.updateMany({}, { $set: { read: true } });
     res.status(200).json({
       status: 'success',
       message: `Updated ${result.modifiedCount} of ${result.matchedCount} successfully`,

@@ -149,7 +149,7 @@ export const getNearbyUsers = async (req, res, next) => {
   const { maxDistance = 10000, search = '', userType } = req.params;
 
   try {
-    const user = await User.findOne({ id: req.session.user.uid });
+    const user = req.user; //await User.findOne({ id: req.session.user.uid });
     if (!user) {
       return next(new AppError('User is not logged in', 403));
     }
@@ -177,8 +177,10 @@ export const getNearbyUsers = async (req, res, next) => {
           maxDistance: Number(maxDistance),
           spherical: true, // Use spherical geometry for calculations
           query, // Optional: Any additional query criteria
-          sort: { distance: 1 }, // Sort by distance, 1 for ascending (nearest first)
         },
+      },
+      {
+        $sort: { distance: 1 }, // Sort by distance in ascending order
       },
     ]);
     res.status(200).json(users);

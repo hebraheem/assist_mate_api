@@ -33,18 +33,21 @@ export const getNotifications = async (req, res, next) => {
 
 export const getNotification = async (req, res, next) => {
   try {
-    const notification = await Notification.findById(req.params.id);
+    let notification = await Notification.findById(req.params.id);
     if (!notification) {
       return next(new AppError('Notification not found', 404));
     }
-    await Notification.findByIdAndUpdate(
+
+    notification = await Notification.findByIdAndUpdate(
       notification._id,
       { read: true },
       { new: true },
-    );
-    res
-      .status(200)
-      .json({ notification, message: 'Notification fetched successfully' });
+    ).populate([{ path: 'user', select: 'firstName lastName id avatar' }]);
+
+    res.status(200).json({
+      notification,
+      message: 'Notification fetched successfully',
+    });
   } catch (error) {
     next(error);
   }

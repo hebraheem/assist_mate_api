@@ -207,7 +207,7 @@ const sendPushAndCreateNotifications = async (
 
 export const getNearbyRequests = async (req, res, next) => {
   const { latitude, longitude, distance = 10 } = req.query; // Distance in km, default 10 km
-
+  const user = req.user;
   if (!latitude || !longitude) {
     return next(new AppError('Latitude and longitude are required', 400));
   }
@@ -228,6 +228,8 @@ export const getNearbyRequests = async (req, res, next) => {
       },
     })
       .limit(req.params?.limit)
+      .where({ createdBy: { $ne: user._id } }) // Exclude current user's requests
+      .populate({ path: 'user', select: 'firstName lastName id avatar' })
       .exec();
 
     res.status(200).json({

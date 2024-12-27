@@ -228,7 +228,10 @@ export const getNearbyRequests = async (req, res, next) => {
       },
     })
       .limit(req.params?.limit)
-      .where({ createdBy: { $ne: user._id } }) // Exclude current user's requests
+      .where({
+        createdBy: { $ne: user._id }, // Exclude current user's requests
+        status: { $nin: ['COMPLETED', 'CANCELED'] },
+      })
       .populate({ path: 'user', select: 'firstName lastName id avatar' })
       .exec();
 

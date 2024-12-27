@@ -63,8 +63,13 @@ export const getRequests = async (req, res, next) => {
   if (!history || history === 'false') {
     searchCriteria.createdBy = { $ne: req.user._id };
   } else {
-    searchCriteria.createdBy = req.user._id;
+    searchCriteria['$or'] = [
+      { tempResolvers: { $in: [req.user._id] } }, // Current user in tempResolvers
+      { resolver: req.user._id }, // Current user as resolver
+      { createdBy: req.user._id }, // Current user as resolver
+    ];
   }
+
   if (search) {
     searchCriteria.$or = [
       { title: { $regex: search, $options: 'i' } },
@@ -231,6 +236,10 @@ export const getNearbyRequests = async (req, res, next) => {
       .where({
         createdBy: { $ne: user._id }, // Exclude current user's requests
         status: { $nin: ['COMPLETED', 'CANCELED'] },
+        $or: [
+          { tempResolvers: { $in: [user._id] } }, // Current user in tempResolvers
+          { resolver: user._id }, // Current user as resolver
+        ],
       })
       .populate({ path: 'user', select: 'firstName lastName id avatar' })
       .exec();

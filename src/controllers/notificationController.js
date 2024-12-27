@@ -42,7 +42,7 @@ export const getNotification = async (req, res, next) => {
       notification._id,
       { read: true },
       { new: true },
-    ).populate([{ path: 'user', select: 'firstName lastName id avatar' }]);
+    ).populate([{ path: 'owner', select: 'firstName lastName id avatar' }]);
 
     res.status(200).json({
       notification,

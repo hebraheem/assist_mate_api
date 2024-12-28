@@ -32,7 +32,11 @@ const app = express();
 dotenv.config();
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  origin: '*',
+  methods: ['GET', 'POST'],
+  credentials: true,
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -84,6 +88,23 @@ app.use(
   checkOwnership(Notification),
   notificationRoutes,
 );
+
+io.use(async (socket, next) => {
+  try {
+    const token = socket.handshake.auth.token; // Expecting token in handshake auth
+    if (!token) {
+      throw new Error('Authentication token is missing');
+    }
+
+    // Verify the token (e.g., using Firebase Admin, JWT, etc.)
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    socket.user = decodedToken; // Attach user info to the socket
+    next();
+  } catch (err) {
+    console.error('Authentication error:', err.message);
+    next(new Error('Unauthorized')); // This will result in a 403 error
+  }
+});
 
 // Handle WebSocket connections
 io.on('connection', (socket) => {

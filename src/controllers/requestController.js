@@ -12,7 +12,9 @@ export const createRequest = async (req, res, next) => {
       return next(new AppError('User not signed in', 403));
     }
 
-    const tempResolver = await User.findById(req.body.tempResolvers?.[0]);
+    const tempResolver = await User.findById(
+      req.body.tempResolvers?.[0],
+    ).select('fmcToken');
 
     if (!tempResolver) {
       return next(new AppError('Temporary resolver not found', 401));
@@ -108,9 +110,12 @@ export const getRequests = async (req, res, next) => {
 export const getRequest = async (req, res, next) => {
   try {
     const request = await Request.findById(req.params.id)
-      .populate({ path: 'user', select: 'firstName lastName id' })
-      .populate({ path: 'createdBy', select: 'firstName lastName id' })
-      .populate({ path: 'tempResolvers', select: 'firstName lastName id' });
+      .populate({ path: 'user', select: 'firstName lastName id avatar' })
+      .populate({ path: 'createdBy', select: 'firstName lastName id avatar' })
+      .populate({
+        path: 'tempResolvers',
+        select: 'firstName lastName id avatar',
+      });
     if (!request) {
       return next(new AppError('Request not found', 404));
     }

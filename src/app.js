@@ -20,6 +20,7 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 import authenticateFirebaseToken from './middlewares/authMiddleware.js';
 import setupSwaggerDocs from './config/swagger.js';
 import MongoStore from 'connect-mongo';
@@ -82,6 +83,7 @@ setupSwaggerDocs(app);
 app.use('/auth', authRoutes);
 app.use('/', authenticateFirebaseToken, userRoutes);
 app.use('/', authenticateFirebaseToken, checkOwnership(Request), requestRoutes);
+app.use('/', authenticateFirebaseToken, chatRoutes);
 app.use(
   '/',
   authenticateFirebaseToken,

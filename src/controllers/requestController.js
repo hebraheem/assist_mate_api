@@ -135,7 +135,7 @@ export const updateRequest = async (req, res, next) => {
 
     // Attempt to update the request only if the status is 'CREATED'
     const request = await Request.findOneAndUpdate(
-      { _id: id, status: 'CREATED' }, // Only match requests in the 'CREATED' status
+      { _id: id, status: { $in: ['CREATED', 'REJECTED'] } }, // Only match requests in the 'CREATED' status
       updateData,
       {
         new: true,

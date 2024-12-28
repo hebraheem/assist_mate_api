@@ -170,4 +170,4 @@ app.use(handleNotFoundError); // Catch any non-existing routes
 // Error Handling Middleware
 app.use(errorHandler); // Handle all errors
 
-export default server;
+export default app;

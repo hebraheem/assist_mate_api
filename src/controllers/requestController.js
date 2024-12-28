@@ -376,7 +376,7 @@ const sendPushAndCreateNotifications = async (
   if (req.params?.action === 'CANCEL') {
     reqBody.body.description = `${user?.fullName || ''} accepts your request`;
   }
-  if (reqBody.body.description) reqBody.body.description = req.body.reason;
+  if (!reqBody.body.description) reqBody.body.description = req.body.reason;
   const notification = {
     title: createdRequest.title,
     description: reqBody.body.description,

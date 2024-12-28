@@ -10,8 +10,8 @@ export const getNotifications = async (req, res, next) => {
   if (read) {
     searchCriteria.read = read;
   }
-  if (req.user?.user_id) {
-    searchCriteria.createdBy = req.user.user_id;
+  if (req.user?._id) {
+    searchCriteria.user = req.user._id;
   }
 
   const orderBy = { [sort]: sortDir };

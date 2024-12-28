@@ -23,7 +23,7 @@ const requestSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['CREATED', 'IN_PROGRESS', 'COMPLETED', 'CANCELED', 'REJECTED'],
+      enum: ['CREATED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'REJECTED'],
       default: 'CREATED',
     },
     otherCategory: {
@@ -59,6 +59,12 @@ const requestSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+    },
+    requestOffer: {
+      paid: { type: Boolean, default: false },
+      paymentAmount: { type: Number, default: 0 },
+      reason: { type: String, default: '' },
+      currency: { type: String, default: '' },
     },
   },
   { timestamps: true },

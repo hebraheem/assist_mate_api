@@ -36,11 +36,11 @@ const notificationSchema = new Schema(
       required: true,
       ref: 'User',
     },
-    createdBy: {
-      type: String,
-      required: true,
-      ref: 'User',
-    },
+    // createdBy: {
+    //   type: String,
+    //   required: true,
+    //   ref: 'User',
+    // },
     read: {
       type: Boolean,
       default: false,

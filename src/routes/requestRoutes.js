@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  acceptRejectOrCancelRequest,
   createRequest,
   deleteRequest,
   getNearbyRequests,
@@ -246,7 +247,7 @@ router.get('/requests/near', getNearbyRequests);
  *         required: false
  *         schema:
  *           type: string
- *           enum: ['CREATED', 'IN_PROGRESS', 'COMPLETED', 'CANCELED']
+ *           enum: ['CREATED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']
  *       - name: sort
  *         in: query
  *         description: Field to sort users by.
@@ -323,6 +324,112 @@ router.get('/requests/:id', getRequest);
  *         description: Invalid input
  */
 router.post('/requests', createRequest);
+
+/**
+ * @swagger
+ * /requests/{id}/{action}:
+ *   patch:
+ *     summary: Accept, Reject or Cancel a Request
+ *     description: Updates the status of a request to either "ACCEPT", "REJECT" or "CANCEL" depending on the action provided.
+ *     tags: [request]
+ *     security:
+ *       - BearerAuth: []
+ *         in: headers
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the request to be updated.
+ *         schema:
+ *           type: string
+ *           example: "676e6e5699b3de9274a51aca"
+ *       - in: path
+ *         name: action
+ *         required: true
+ *         description: The action to perform on the request (either "ACCEPT", "CANCEL" or "REJECT").
+ *         schema:
+ *           type: string
+ *           enum: [ACCEPT, REJECT, CANCEL]
+ *           example: "ACCEPT"
+ *     responses:
+ *       200:
+ *         description: Request successfully updated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Request successfully accepted and updated.
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "676e6e5699b3de9274a51aca"
+ *                     status:
+ *                       type: string
+ *                       example: IN_PROGRESS
+ *                     requestOffer:
+ *                       type: object
+ *                       properties:
+ *                         paid:
+ *                           type: boolean
+ *                           example: true
+ *                         paymentAmount:
+ *                           type: number
+ *                           example: 0
+ *                         reason:
+ *                           type: string
+ *                           example: Accepted request
+ *                         currency:
+ *                           type: string
+ *                           example: USD
+ *       400:
+ *         description: Invalid action or invalid request state for the action.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: fail
+ *                 message:
+ *                   type: string
+ *                   example: Request cannot be accepted as it is currently in COMPLETED status.
+ *       404:
+ *         description: Request not found or invalid action type.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: fail
+ *                 message:
+ *                   type: string
+ *                   example: Request not found
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Something went wrong
+ */
+router.patch('/requests/:id/:action', acceptRejectOrCancelRequest);
 
 /**
  * @swagger

@@ -1,8 +1,4 @@
-import {
-  browserLocalPersistence,
-  setPersistence,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { admin, auth } from '../config/firebase.cjs';
 import localStorage from '../utils/localStorage.js';
 import AppError from '../utils/appError.js';
@@ -72,35 +68,33 @@ export const loginUser = async (req, res, next) => {
   }
 
   try {
-    await setPersistence(auth, browserLocalPersistence).then(async () => {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
 
-      if (!userCredential) {
-        return next(new AppError('Invalid email or password', 404));
-      }
-      const user = userCredential.user;
-      // Send user details and token as response
-      const idToken = await user.getIdToken();
-      const userAvailable = await User.findOne({ id: user.uid });
-      if (!userAvailable) {
-        return next(new AppError('User not found.', 400));
-      }
-      res.status(200).json({
-        message: 'Login successful',
-        idToken,
-        user: {
-          email: user.email,
-          displayName: user.displayName,
-        },
-      });
-      req.session.user = user;
-      localStorage.setItem('jwtToken', idToken);
-      localStorage.setItem('userCredential', JSON.stringify(userCredential));
+    if (!userCredential) {
+      return next(new AppError('Invalid email or password', 404));
+    }
+    const user = userCredential.user;
+    // Send user details and token as response
+    const idToken = await user.getIdToken();
+    const userAvailable = await User.findOne({ id: user.uid });
+    if (!userAvailable) {
+      return next(new AppError('User not found.', 400));
+    }
+    res.status(200).json({
+      message: 'Login successful',
+      idToken,
+      user: {
+        email: user.email,
+        displayName: user.displayName,
+      },
     });
+    req.session.user = user;
+    localStorage.setItem('jwtToken', idToken);
+    localStorage.setItem('userCredential', JSON.stringify(userCredential));
   } catch (error) {
     return next(error);
   }

@@ -342,7 +342,7 @@ router.post('/requests', createRequest);
  *         description: The ID of the request to be updated.
  *         schema:
  *           type: string
- *           example: "676e6e5699b3de9274a51aca"
+ *           example: "676d663f6f469a37cc65c6b8"
  *       - in: path
  *         name: action
  *         required: true
@@ -351,6 +351,23 @@ router.post('/requests', createRequest);
  *           type: string
  *           enum: [ACCEPT, REJECT, CANCEL]
  *           example: "ACCEPT"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *              paid:
+ *               type: boolean
+ *               example: false
+ *              paymentAmount:
+ *               type: number
+ *               example: 0
+ *              reason:
+ *               type: string
+ *              currency:
+ *               type: string
  *     responses:
  *       200:
  *         description: Request successfully updated.

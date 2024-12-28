@@ -112,6 +112,7 @@ export const getRequest = async (req, res, next) => {
     const request = await Request.findById(req.params.id)
       .populate({ path: 'user', select: 'firstName lastName id avatar' })
       .populate({ path: 'createdBy', select: 'firstName lastName id avatar' })
+      .populate({ path: 'resolver', select: 'firstName lastName id avatar' })
       .populate({
         path: 'tempResolvers',
         select: 'firstName lastName id avatar',
@@ -367,21 +368,25 @@ const sendPushAndCreateNotifications = async (
   resolver,
 ) => {
   const reqBody = { ...req };
-  const isAcceptance = req.body?.resolver;
+  const isAcceptance =
+    req.params?.action === 'ACCEPT' || req.params?.action === 'REJECT';
   if (isAcceptance) {
-    reqBody.body.description = `${resolver?.username || ''} accepts your request`;
+    reqBody.body.description = `${resolver?.fullName || ''} accepts your request`;
   }
+  if (req.params?.action === 'CANCEL') {
+    reqBody.body.description = `${user?.fullName || ''} accepts your request`;
+  }
+  if (reqBody.body.description) reqBody.body.description = req.body.reason;
   const notification = {
     title: createdRequest.title,
     description: reqBody.body.description,
     trigger:
       reqBody.params.id && !reqBody.params?.action
         ? 'request_updated'
-        : `request_${reqBody.params?.action + 'ed' ?? 'created'}`,
+        : `request_${reqBody.params?.action ?? 'created'}ed`,
     notificationId: createdRequest._id,
     dueDateTime: reqBody.body?.dueDateTime,
     user: isAcceptance ? user._id : resolver._id,
-    // createdBy: isAcceptance ? user.id : resolver.id,
     owner: isAcceptance ? resolver._id : user._id,
   };
   await sendPushNotification(resolver.fmcToken, {

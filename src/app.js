@@ -34,7 +34,7 @@ dotenv.config();
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  origin: '*',
+  origin: 'http://localhost:3005',
   methods: ['GET', 'POST'],
   credentials: true,
 });
@@ -193,4 +193,4 @@ app.use(handleNotFoundError); // Catch any non-existing routes
 // Error Handling Middleware
 app.use(errorHandler); // Handle all errors
 
-export default app;
+export default server;

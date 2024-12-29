@@ -26,8 +26,7 @@ export default async function sendPushNotification(subscription, dataToSend) {
       JSON.parse(subscription),
       JSON.stringify(dataToSend),
     );
-    // eslint-disable-next-line no-console
-    console.log('Notification sent successfully:', response);
+
     return response;
   } catch (error) {
     // eslint-disable-next-line no-console

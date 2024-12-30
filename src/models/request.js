@@ -71,6 +71,8 @@ const requestSchema = new Schema(
 );
 
 requestSchema.index({ coordinate: '2dsphere' });
+requestSchema.index({ resolver: 1 });
+requestSchema.index({ tempResolvers: 1 });
 requestSchema.index({
   title: 'text',
   description: 'text',

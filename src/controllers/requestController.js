@@ -58,6 +58,7 @@ export const getRequests = async (req, res, next) => {
     status,
     user,
     history = false,
+    involvedUsers,
   } = req.query;
 
   const searchCriteria = {};
@@ -88,6 +89,12 @@ export const getRequests = async (req, res, next) => {
   }
   if (user) {
     searchCriteria.user = user;
+  }
+  if (involvedUsers) {
+    searchCriteria.$or = [
+      { resolver: involvedUsers },
+      { tempResolvers: involvedUsers },
+    ];
   }
 
   const orderBy = { [sort]: sortDir };

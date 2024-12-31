@@ -16,9 +16,6 @@ export const createRequest = async (req, res, next) => {
       req.body.tempResolvers?.[0],
     ).select('fmcToken');
 
-    if (!tempResolver) {
-      return next(new AppError('Temporary resolver not found', 401));
-    }
     const request = new Request({
       ...req.body,
       user: user._id,

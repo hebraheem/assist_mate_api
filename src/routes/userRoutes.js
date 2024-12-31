@@ -548,6 +548,20 @@ router.post('/send-verification-email', sendVerificationEmail);
  *         schema:
  *           type: integer
  *           default: 100
+ *       - name: lng
+ *         in: query
+ *         description: Destination longitude.
+ *         required: false
+ *         schema:
+ *           type: decimal
+ *           default: 9.854572063500108
+ *       - name: lat
+ *         in: query
+ *         description: Destination latitude.
+ *         required: false
+ *         schema:
+ *           type: decimal
+ *           default: 49.94205541938273
  *       - name: page
  *         in: query
  *         description: Page number to retrieve.

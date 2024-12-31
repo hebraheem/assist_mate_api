@@ -146,7 +146,8 @@ export async function sendVerificationEmail(req, res, next) {
 }
 
 export const getNearbyUsers = async (req, res, next) => {
-  const { maxDistance = 10000, search = '', userType } = req.params;
+  const { maxDistance = 10000 } = req.params;
+  const { search = '', userType, lat, lng } = req.query;
 
   try {
     const user = req.user; //await User.findOne({ id: req.session.user.uid });
@@ -165,6 +166,11 @@ export const getNearbyUsers = async (req, res, next) => {
         { lastName: { $regex: search, $options: 'i' } },
       ];
     }
+    const coordinate = structuredClone(user.coordinate);
+
+    if (lat && lng) {
+      coordinate.coordinates = [Number(lng), Number(lat)]; // [longitude, latitude]
+    }
 
     if (userType) {
       query.userType = userType;
@@ -172,7 +178,7 @@ export const getNearbyUsers = async (req, res, next) => {
     const users = await User.aggregate([
       {
         $geoNear: {
-          near: user.coordinate,
+          near: coordinate,
           distanceField: 'distance',
           maxDistance: Number(maxDistance),
           spherical: true, // Use spherical geometry for calculations

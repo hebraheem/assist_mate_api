@@ -49,8 +49,15 @@ const requestSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: 'User',
+        default: [],
       },
     ],
+    destination: {
+      type: String,
+      required: true,
+      trim: true,
+      default: '',
+    },
     coordinate: {
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: { type: [Number], required: true }, // [longitude, latitude]

@@ -32,7 +32,7 @@ export const getAllUsers = async (req, res, next) => {
     search = '',
     userType,
     sort = 'createdAt',
-    sortDir = 'asc',
+    sortDir = 'desc',
   } = req.query;
 
   const searchCriteria = {

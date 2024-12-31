@@ -51,7 +51,7 @@ export const getRequests = async (req, res, next) => {
     search = '',
     category,
     sort = 'createdAt',
-    sortDir = 'asc',
+    sortDir = 'desc',
     status,
     user,
     history = false,

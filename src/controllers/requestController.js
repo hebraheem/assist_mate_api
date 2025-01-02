@@ -375,10 +375,10 @@ const sendPushAndCreateNotifications = async (
   const isAcceptance =
     req.params?.action === 'ACCEPT' || req.params?.action === 'REJECT';
   if (isAcceptance) {
-    reqBody.body.description = `${resolver?.fullName || ''} accepts your request`;
+    reqBody.body.description = `${resolver?.fullName || ''} ${req.params?.action?.toLowerCase()}s your request`;
   }
   if (req.params?.action === 'CANCEL') {
-    reqBody.body.description = `${user?.fullName || ''} accepts your request`;
+    reqBody.body.description = `${user?.fullName || ''} canceled the request`;
   }
   if (!reqBody.body.description) reqBody.body.description = req.body.reason;
   const notification = {
